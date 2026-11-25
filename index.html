@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline India | Elevate Your Journey</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#050B18',
+                            900: '#0A162E',
+                            800: '#112244',
+                            700: '#1D3566',
+                        },
+                        skybrand: {
+                            500: '#0EA5E9',
+                            600: '#0284C7',
+                        },
+                        gold: {
+                            400: '#FBBF24',
+                            500: '#F59E0B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-skybrand-500 selection:text-white overflow-x-hidden">
+
+    <!-- Toast Notification Container (Replaces alert) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-navy-950/95 backdrop-blur-md text-white border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('book')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-skybrand-600 to-skybrand-500 flex items-center justify-center shadow-lg shadow-skybrand-500/30">
+                        <i data-lucide="plane" class="w-6 h-6 text-white -rotate-45"></i>
+                    </div>
+                    <div>
+                        <span class="font-display font-extrabold text-xl tracking-tight">AIRLINE</span>
+                        <span class="block text-[10px] tracking-[0.25em] text-skybrand-500 font-semibold uppercase -mt-1">India</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex items-center gap-1 bg-navy-900/80 p-1.5 rounded-2xl border border-white/10">
+                    <button onclick="switchTab('book')" id="nav-book" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium transition-all bg-skybrand-600 text-white shadow">
+                        Book Flight
+                    </button>
+                    <button onclick="switchTab('manage')" id="nav-manage" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-all">
+                        Manage & Check-In
+                    </button>
+                    <button onclick="switchTab('status')" id="nav-status" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-all">
+                        Flight Status
+                    </button>
+                    <button onclick="switchTab('loyalty')" id="nav-loyalty" class="nav-btn px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                        <i data-lucide="crown" class="w-4 h-4 text-gold-400"></i> SkyClub
+                    </button>
+                </nav>
+
+                <!-- User Profile / Miles Pill -->
+                <div class="hidden sm:flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400">SkyClub Gold</div>
+                        <div class="text-sm font-bold text-gold-400" id="header-miles">48,250 pts</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-navy-800 border border-white/15 flex items-center justify-center font-bold text-sm text-skybrand-400">
+                        AR
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl bg-navy-900 border border-white/10 text-slate-200">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden bg-navy-900 border-t border-white/10 px-4 pt-3 pb-5 space-y-2">
+            <button onclick="switchTab('book'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium bg-navy-800 text-white">Book Flight</button>
+            <button onclick="switchTab('manage'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300">Manage & Check-In</button>
+            <button onclick="switchTab('status'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-300">Flight Status</button>
+            <button onclick="switchTab('loyalty'); toggleMobileMenu()" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gold-400">SkyClub Rewards</button>
+        </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 1: BOOK FLIGHT & SEARCH ENGINE                                -->
+    <!-- ===================================================================== -->
+    <main id="section-book" class="tab-section">
+        <!-- Hero Banner -->
+        <section class="relative bg-navy-950 text-white pt-12 pb-28 lg:pb-36 overflow-hidden">
+            <!-- Decorative Background Gradients -->
+            <div class="absolute inset-0 opacity-30 pointer-events-none">
+                <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-skybrand-600 blur-3xl"></div>
+                <div class="absolute bottom-0 left-1/4 w-80 h-80 rounded-full bg-indigo-600 blur-3xl"></div>
+            </div>
+
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-2xl">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-medium text-skybrand-400 mb-4">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Direct Dreamliner Routes Now Open for 2026
+                    </span>
+                    <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                        Where will the sky take you next?
+                    </h1>
+                    <p class="mt-4 text-slate-300 text-base sm:text-lg">
+                        Experience next-generation cabin comfort, zero-hassle digital boarding, and global connectivity across 140+ destinations.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Floating Flight Search Card -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-900/10 border border-slate-200/80 p-6 sm:p-8">
+                <!-- Trip Type & Cabin Selector -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+                        <button type="button" onclick="setTripType('round')" id="trip-round" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-white text-navy-900 shadow-sm transition-all">Round Trip</button>
+                        <button type="button" onclick="setTripType('oneway')" id="trip-oneway" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-navy-900 transition-all">One Way</button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            <i data-lucide="users" class="w-4 h-4 text-slate-500"></i>
+                            <select id="search-passengers" class="bg-transparent text-sm font-medium text-slate-800 focus:outline-none">
+                                <option value="1">1 Passenger</option>
+                                <option value="2">2 Passengers</option>
+                                <option value="3">3 Passengers</option>
+                                <option value="4">4 Passengers</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+                            <i data-lucide="armchair" class="w-4 h-4 text-slate-500"></i>
+                            <select id="search-cabin" class="bg-transparent text-sm font-medium text-slate-800 focus:outline-none">
+                                <option value="Economy">Economy Class</option>
+                                <option value="Premium">Premium Economy</option>
+                                <option value="Business">Airline India Business</option>
+                                <option value="First">Royal First Suite</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Inputs Grid -->
+                <form onsubmit="handleFlightSearch(event)" class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <!-- Origin -->
+                    <div class="md:col-span-3 relative">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">From</label>
+                        <div class="relative">
+                            <i data-lucide="plane-takeoff" class="w-5 h-5 text-skybrand-600 absolute left-3.5 top-3.5"></i>
+                            <select id="search-origin" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-skybrand-500 focus:border-skybrand-500 outline-none appearance-none">
+                                <option value="DEL">New Delhi (DEL)</option>
+                                <option value="LHR">London Heathrow (LHR)</option>
+                                <option value="JFK">New York (JFK)</option>
+                                <option value="HND">Tokyo Haneda (HND)</option>
+                                <option value="DXB">Dubai (DXB)</option>
+                                <option value="SIN">Singapore (SIN)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Swap Button -->
+                    <div class="md:col-span-1 flex justify-center">
+                        <button type="button" onclick="swapAirports()" title="Swap Airports" class="p-3 rounded-2xl bg-slate-100 hover:bg-skybrand-50 text-slate-600 hover:text-skybrand-600 border border-slate-200 transition-all">
+                            <i data-lucide="arrow-left-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Destination -->
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">To</label>
+                        <div class="relative">
+                            <i data-lucide="plane-landing" class="w-5 h-5 text-skybrand-600 absolute left-3.5 top-3.5"></i>
+                            <select id="search-dest" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-skybrand-500 focus:border-skybrand-500 outline-none appearance-none">
+                                <option value="LHR">London Heathrow (LHR)</option>
+                                <option value="JFK">New York (JFK)</option>
+                                <option value="HND">Tokyo Haneda (HND)</option>
+                                <option value="SIN">Singapore (SIN)</option>
+                                <option value="DXB">Dubai (DXB)</option>
+                                <option value="DEL">New Delhi (DEL)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Departure Date -->
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Departure</label>
+                        <input type="date" id="search-depart-date" required class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-skybrand-500 outline-none">
+                    </div>
+
+                    <!-- Return Date -->
+                    <div class="md:col-span-2" id="return-date-wrapper">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Return</label>
+                        <input type="date" id="search-return-date" class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-900 focus:ring-2 focus:ring-skybrand-500 outline-none">
+                    </div>
+
+                    <!-- Search Submit -->
+                    <div class="md:col-span-1">
+                        <button type="submit" class="w-full py-3.5 px-4 bg-skybrand-600 hover:bg-skybrand-500 text-white font-semibold rounded-2xl shadow-lg shadow-skybrand-600/30 flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="search" class="w-5 h-5"></i>
+                            <span class="md:hidden">Search Flights</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Dynamic Search Results & Booking Workflow Area -->
+        <section id="search-results-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-navy-900" id="results-heading">Available Flights</h2>
+                    <p class="text-sm text-slate-500" id="results-subheading">Showing flexible fares with complimentary cabin baggage</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-medium text-slate-500">Sort by:</span>
+                    <select id="sort-flights" onchange="renderFlightList()" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-700">
+                        <option value="price">Lowest Price</option>
+                        <option value="duration">Shortest Duration</option>
+                        <option value="departure">Earliest Departure</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Flight Cards List -->
+            <div id="flights-list" class="space-y-4"></div>
+        </section>
+
+        <!-- Featured Destinations & Offers (Shown initially) -->
+        <section id="featured-destinations" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 mb-20">
+            <div class="flex items-end justify-between mb-8">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-skybrand-600">Curated Escapes</span>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mt-1">Trending Flight Deals</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all">
+                    <div class="relative h-52 overflow-hidden bg-navy-900">
+                        <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80"
+                             onerror="this.src='https://placehold.co/800x500/0A162E/FFFFFF?text=London+Heathrow'"
+                             alt="London" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-4 left-4 bg-navy-950/80 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full">Non-stop • 9h 15m</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">New Delhi (DEL) to</p>
+                                <h3 class="font-display text-xl font-bold text-navy-900">London (LHR)</h3>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block">From</span>
+                                <span class="text-lg font-extrabold text-skybrand-600">$649</span>
+                            </div>
+                        </div>
+                        <button onclick="quickSelectRoute('DEL', 'LHR')" class="mt-5 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-navy-900 text-navy-900 hover:text-white font-semibold text-sm transition-colors">
+                            View Fares
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all">
+                    <div class="relative h-52 overflow-hidden bg-navy-900">
+                        <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80"
+                             onerror="this.src='https://placehold.co/800x500/0A162E/FFFFFF?text=Tokyo+Haneda'"
+                             alt="Tokyo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-4 left-4 bg-navy-950/80 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full">Non-stop • 7h 40m</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">New Delhi (DEL) to</p>
+                                <h3 class="font-display text-xl font-bold text-navy-900">Tokyo (HND)</h3>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block">From</span>
+                                <span class="text-lg font-extrabold text-skybrand-600">$589</span>
+                            </div>
+                        </div>
+                        <button onclick="quickSelectRoute('DEL', 'HND')" class="mt-5 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-navy-900 text-navy-900 hover:text-white font-semibold text-sm transition-colors">
+                            View Fares
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all">
+                    <div class="relative h-52 overflow-hidden bg-navy-900">
+                        <img src="https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=800&q=80"
+                             onerror="this.src='https://placehold.co/800x500/0A162E/FFFFFF?text=New+York+JFK'"
+                             alt="New York" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-4 left-4 bg-navy-950/80 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full">1 Stop • 15h 20m</span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500">London (LHR) to</p>
+                                <h3 class="font-display text-xl font-bold text-navy-900">New York (JFK)</h3>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block">From</span>
+                                <span class="text-lg font-extrabold text-skybrand-600">$519</span>
+                            </div>
+                        </div>
+                        <button onclick="quickSelectRoute('LHR', 'JFK')" class="mt-5 w-full py-2.5 rounded-xl bg-slate-100 hover:bg-navy-900 text-navy-900 hover:text-white font-semibold text-sm transition-colors">
+                            View Fares
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 2: MANAGE BOOKING & ONLINE CHECK-IN                           -->
+    <!-- ===================================================================== -->
+    <section id="section-manage" class="tab-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="max-w-3xl mx-auto text-center mb-10">
+            <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-navy-900">Manage Bookings & Online Check-In</h1>
+            <p class="text-slate-600 mt-2">View upcoming itineraries, upgrade seats, add extra baggage, or generate your digital boarding pass.</p>
+        </div>
+
+        <!-- PNR Lookup Bar -->
+        <div class="max-w-2xl mx-auto bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-10">
+            <form onsubmit="lookupBooking(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div class="sm:col-span-5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Booking Reference (PNR)</label>
+                    <input type="text" id="pnr-input" placeholder="e.g. IND892" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-mono uppercase font-bold text-sm focus:ring-2 focus:ring-skybrand-500 outline-none">
+                </div>
+                <div class="sm:col-span-4">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Last Name</label>
+                    <input type="text" id="lastname-input" placeholder="e.g. Sharma" class="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-medium text-sm focus:ring-2 focus:ring-skybrand-500 outline-none">
+                </div>
+                <div class="sm:col-span-3 flex items-end">
+                    <button type="submit" class="w-full py-2.5 px-4 bg-navy-900 hover:bg-navy-800 text-white font-semibold rounded-xl text-sm transition-all">
+                        Retrieve
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Active Bookings List -->
+        <div class="space-y-6" id="my-bookings-list"></div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 3: LIVE FLIGHT STATUS TRACKER                                 -->
+    <!-- ===================================================================== -->
+    <section id="section-status" class="tab-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="max-w-3xl mx-auto text-center mb-10">
+            <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-navy-900">Real-Time Flight Status</h1>
+            <p class="text-slate-600 mt-2">Track live departure gates, baggage carousels, and estimated arrival times across the Aetheris network.</p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="max-w-xl mx-auto mb-8">
+            <div class="relative">
+                <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 top-3.5"></i>
+                <input type="text" id="status-filter" oninput="renderFlightStatus()" placeholder="Search by Flight Number (e.g. AI-104) or City..." class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm text-sm focus:ring-2 focus:ring-skybrand-500 outline-none">
+            </div>
+        </div>
+
+        <!-- Live Flight Board -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-navy-950 text-white text-xs uppercase tracking-wider">
+                            <th class="py-4 px-6">Flight</th>
+                            <th class="py-4 px-6">Route</th>
+                            <th class="py-4 px-6">Scheduled</th>
+                            <th class="py-4 px-6">Terminal / Gate</th>
+                            <th class="py-4 px-6">Aircraft</th>
+                            <th class="py-4 px-6">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flight-status-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SECTION 4: SKYCLUB LOYALTY & MILES REWARDS                            -->
+    <!-- ===================================================================== -->
+    <section id="section-loyalty" class="tab-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800 rounded-3xl p-8 sm:p-10 text-white shadow-xl mb-10 relative overflow-hidden">
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/20 border border-gold-400/30 text-gold-400 text-xs font-bold uppercase tracking-wider mb-3">
+                        <i data-lucide="award" class="w-4 h-4"></i> Elite Tier Member
+                    </div>
+                    <h1 class="font-display text-3xl sm:text-4xl font-extrabold">Airline India SkyClub Gold</h1>
+                    <p class="text-slate-300 mt-2 max-w-xl">Enjoy priority boarding, complimentary lounge access worldwide, and +75% bonus miles on every Airline India flight.</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 min-w-[260px]">
+                    <div class="text-xs uppercase tracking-wider text-slate-300">Available Balance</div>
+                    <div class="font-display text-4xl font-extrabold text-gold-400 mt-1" id="loyalty-balance-display">48,250</div>
+                    <div class="text-xs text-slate-300 mt-1">SkyMiles • 11,750 pts to Platinum</div>
+                    <div class="w-full bg-navy-950 rounded-full h-2 mt-3 overflow-hidden">
+                        <div class="bg-gold-400 h-2 rounded-full" style="width: 80%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="font-display text-2xl font-bold text-navy-900 mb-6">Redeem Your SkyMiles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-skybrand-50 text-skybrand-600 flex items-center justify-center mb-4">
+                        <i data-lucide="coffee" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy-900">Airline India Flagship Lounge Pass</h3>
+                    <p class="text-sm text-slate-500 mt-2">Single-visit access to shower suites, chef dining, and quiet workspaces at any hub.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span class="font-bold text-navy-900">5,000 pts</span>
+                    <button onclick="redeemMiles(5000, 'Flagship Lounge Pass')" class="px-4 py-2 rounded-xl bg-navy-900 hover:bg-skybrand-600 text-white text-xs font-semibold transition-colors">Redeem</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy-900">Business Cabin Upgrade</h3>
+                    <p class="text-sm text-slate-500 mt-2">Upgrade an eligible Economy ticket to lie-flat Airline India Business Class on international routes.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span class="font-bold text-navy-900">25,000 pts</span>
+                    <button onclick="redeemMiles(25000, 'Business Cabin Upgrade')" class="px-4 py-2 rounded-xl bg-navy-900 hover:bg-skybrand-600 text-white text-xs font-semibold transition-colors">Redeem</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                        <i data-lucide="luggage" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-display text-lg font-bold text-navy-900">Extra 23kg Checked Bag</h3>
+                    <p class="text-sm text-slate-500 mt-2">Pre-pay an additional checked suitcase for your upcoming itinerary using SkyMiles.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span class="font-bold text-navy-900">3,500 pts</span>
+                    <button onclick="redeemMiles(3500, 'Extra 23kg Checked Bag')" class="px-4 py-2 rounded-xl bg-navy-900 hover:bg-skybrand-600 text-white text-xs font-semibold transition-colors">Redeem</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 1: SEAT SELECTION & PASSENGER CHECKOUT MODAL                    -->
+    <!-- ===================================================================== -->
+    <div id="booking-modal" class="fixed inset-0 z-50 hidden bg-navy-950/75 backdrop-blur-sm overflow-y-auto">
+        <div class="min-h-screen px-4 py-8 flex items-center justify-center">
+            <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden border border-slate-200">
+                <!-- Modal Header -->
+                <div class="bg-navy-950 text-white px-6 py-5 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-skybrand-400 font-bold" id="modal-flight-code">AI-204 • Boeing 787-9</span>
+                        <h3 class="font-display text-xl font-bold" id="modal-route-title">New Delhi (DEL) → London (LHR)</h3>
+                    </div>
+                    <button onclick="closeBookingModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body: Two Columns (Seat Map + Passenger Form) -->
+                <div class="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Interactive Aircraft Cabin Seat Map -->
+                    <div class="lg:col-span-6 bg-slate-50 rounded-2xl p-5 border border-slate-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-display font-bold text-navy-900 text-sm">Select Your Seat</h4>
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-skybrand-100 text-skybrand-700" id="selected-seat-badge">Seat: 14A</span>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="flex items-center justify-center gap-4 text-xs text-slate-600 mb-5 pb-3 border-b border-slate-200">
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded bg-white border border-slate-300 inline-block"></span> Available</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded bg-skybrand-600 inline-block"></span> Selected</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded bg-slate-300 inline-block"></span> Occupied</span>
+                        </div>
+
+                        <!-- Fuselage Seat Grid -->
+                        <div class="max-w-[260px] mx-auto bg-white rounded-t-[3rem] rounded-b-2xl border-2 border-slate-200 p-4 shadow-inner">
+                            <div class="text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Front of Cabin</div>
+                            <div class="grid grid-cols-7 gap-1.5 text-center text-[10px] font-bold text-slate-400 mb-2">
+                                <span>A</span><span>B</span><span>C</span><span></span><span>D</span><span>E</span><span>F</span>
+                            </div>
+                            <div id="seat-map-grid" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Passenger Details & Add-ons -->
+                    <form onsubmit="confirmBooking(event)" class="lg:col-span-6 flex flex-col justify-between space-y-5">
+                        <div class="space-y-4">
+                            <h4 class="font-display font-bold text-navy-900 text-base">Passenger Details</h4>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">First Name</label>
+                                    <input type="text" id="pax-fname" required value="Aarav" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-skybrand-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Last Name</label>
+                                    <input type="text" id="pax-lname" required value="Sharma" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-skybrand-500 outline-none">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Email for E-Ticket</label>
+                                <input type="email" id="pax-email" required value="aarav.sharma@example.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-skybrand-500 outline-none">
+                            </div>
+
+                            <!-- Ancillary Add-ons -->
+                            <div class="pt-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Customize Your Journey</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                                        <div class="flex items-center gap-2.5">
+                                            <input type="checkbox" id="addon-bag" onchange="recalculateTotal()" class="rounded text-skybrand-600 focus:ring-skybrand-500">
+                                            <span class="text-sm font-medium text-slate-800">Extra 23kg Checked Bag</span>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-600">+$45</span>
+                                    </label>
+                                    <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                                        <div class="flex items-center gap-2.5">
+                                            <input type="checkbox" id="addon-meal" onchange="recalculateTotal()" class="rounded text-skybrand-600 focus:ring-skybrand-500">
+                                            <span class="text-sm font-medium text-slate-800">Chef's Gourmet In-Flight Dining</span>
+                                        </div>
+                                        <span class="text-xs font-bold text-slate-600">+$25</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price Breakdown & Confirm -->
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex justify-between text-xs text-slate-500 mb-1">
+                                <span id="summary-cabin-label">Economy Fare (1 Pax)</span>
+                                <span id="summary-base-price">$649</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-500 mb-2">
+                                <span>Taxes, Fees & Add-ons</span>
+                                <span id="summary-addon-price">$65</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                                <span class="font-bold text-navy-900">Total Payable</span>
+                                <span class="font-display text-2xl font-extrabold text-skybrand-600" id="summary-total-price">$714</span>
+                            </div>
+                            <button type="submit" class="mt-4 w-full py-3.5 bg-skybrand-600 hover:bg-skybrand-500 text-white font-bold rounded-xl shadow-lg shadow-skybrand-600/25 transition-all">
+                                Complete Booking & Issue Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL 2: DIGITAL BOARDING PASS MODAL                                  -->
+    <!-- ===================================================================== -->
+    <div id="boarding-pass-modal" class="fixed inset-0 z-50 hidden bg-navy-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200">
+            <div class="bg-gradient-to-r from-navy-950 to-navy-800 p-6 text-white flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="plane" class="w-5 h-5 text-skybrand-400 -rotate-45"></i>
+                    <span class="font-display font-bold tracking-wider text-sm">AIRLINE INDIA BOARDING PASS</span>
+                </div>
+                <button onclick="closeBoardingPass()" class="text-slate-300 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="p-6" id="boarding-pass-content"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-navy-950 text-slate-400 border-t border-white/10 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 text-white mb-4">
+                        <i data-lucide="plane" class="w-5 h-5 text-skybrand-500 -rotate-45"></i>
+                        <span class="font-display font-extrabold text-lg">AIRLINE INDIA</span>
+                    </div>
+                    <p class="text-xs leading-relaxed">Connecting India and continents with sustainable aviation fuel, next-gen Boeing 787 & Airbus A350 fleets, and award-winning hospitality.</p>
+                </div>
+                    <p class="text-xs leading-relaxed">Connecting continents with sustainable aviation fuel, next-gen Boeing 787 & Airbus A350 fleets, and award-winning hospitality.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-3">Flight Operations</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="javascript:void(0)" onclick="switchTab('book')" class="hover:text-white">Route Network</a></li>
+                        <li><a href="javascript:void(0)" onclick="switchTab('status')" class="hover:text-white">Live Flight Tracker</a></li>
+                        <li><a href="javascript:void(0)" onclick="switchTab('manage')" class="hover:text-white">Web Check-In</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-3">Passenger Services</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="javascript:void(0)" onclick="showToast('Baggage allowance: 1x 7kg cabin + 1x 23kg checked included.', 'info')" class="hover:text-white">Baggage Allowance</a></li>
+                        <li><a href="javascript:void(0)" onclick="switchTab('loyalty')" class="hover:text-white">SkyClub Lounges</a></li>
+                        <li><a href="javascript:void(0)" onclick="showToast('24/7 Concierge Desk active at +1-800-AIR-INDIA', 'info')" class="hover:text-white">Special Assistance</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold text-sm mb-3">24/7 Global Support</h4>
+                    <p class="text-xs">Need itinerary assistance? Our concierge desk is available around the clock.</p>
+                    <p class="text-skybrand-400 font-bold text-sm mt-2">+1 (800) 555-0199</p>
+                </div>
+            </div>
+            <div class="border-t border-white/10 mt-10 pt-6 text-xs flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span>© 2026 Airline India Group. All rights reserved.</span>
+                <span>IATA: AI • ICAO: IND</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Logic -->
+    <script>
+        // =========================================================================
+        // 1. STATE & MOCK AVIATION DATASET
+        // =========================================================================
+        const AIRPORTS = {
+            DEL: { city: "New Delhi", name: "Indira Gandhi Intl", terminal: "T3" },
+            LHR: { city: "London", name: "Heathrow Airport", terminal: "T5" },
+            JFK: { city: "New York", name: "John F. Kennedy Intl", terminal: "T4" },
+            HND: { city: "Tokyo", name: "Haneda Airport", terminal: "T3" },
+            DXB: { city: "Dubai", name: "Dubai Intl", terminal: "T1" },
+            SIN: { city: "Singapore", name: "Changi Airport", terminal: "T3" }
+        };
+
+        const FLIGHT_CATALOG = [
+            { id: "AI-104", origin: "DEL", dest: "LHR", depart: "02:15", arrive: "07:30", duration: "9h 15m", durationMins: 555, aircraft: "Boeing 787-9 Dreamliner", stops: "Non-stop", basePrice: 649, gate: "B14", status: "On Time" },
+            { id: "AI-108", origin: "DEL", dest: "LHR", depart: "14:40", arrive: "19:55", duration: "9h 15m", durationMins: 555, aircraft: "Airbus A350-900", stops: "Non-stop", basePrice: 710, gate: "B22", status: "Boarding" },
+            { id: "AI-312", origin: "DEL", dest: "HND", depart: "21:10", arrive: "08:50", duration: "7h 40m", durationMins: 460, aircraft: "Boeing 787-10", stops: "Non-stop", basePrice: 589, gate: "A08", status: "On Time" },
+            { id: "AI-402", origin: "LHR", dest: "JFK", depart: "10:30", arrive: "13:45", duration: "8h 15m", durationMins: 495, aircraft: "Airbus A350-1000", stops: "Non-stop", basePrice: 519, gate: "C19", status: "On Time" },
+            { id: "AI-509", origin: "DEL", dest: "DXB", depart: "08:20", arrive: "10:50", duration: "3h 30m", durationMins: 210, aircraft: "Airbus A321neo", stops: "Non-stop", basePrice: 245, gate: "A12", status: "Delayed 20m" },
+            { id: "AI-615", origin: "DEL", dest: "SIN", depart: "23:05", arrive: "07:15", duration: "5h 40m", durationMins: 340, aircraft: "Boeing 787-9 Dreamliner", stops: "Non-stop", basePrice: 340, gate: "B04", status: "On Time" },
+            { id: "AI-720", origin: "JFK", dest: "LHR", depart: "19:00", arrive: "07:10", duration: "7h 10m", durationMins: 430, aircraft: "Boeing 777-300ER", stops: "Non-stop", basePrice: 540, gate: "D06", status: "On Time" }
+        ];
+
+        const CABIN_MULTIPLIERS = {
+            Economy: 1,
+            Premium: 1.55,
+            Business: 2.8,
+            First: 4.5
+        };
+
+        let appState = {
+            tripType: 'round',
+            miles: 48250,
+            currentSearchResults: [],
+            activeFlight: null,
+            selectedSeat: '14A',
+            occupiedSeats: ['12B', '12E', '13C', '14D', '15A', '15F', '16C', '17D'],
+            bookings: [
+                {
+                    pnr: "IND892",
+                    flightId: "AI-104",
+                    origin: "DEL",
+                    dest: "LHR",
+                    date: "2026-12-12",
+                    depart: "02:15",
+                    arrive: "07:30",
+                    passenger: "Aarav Sharma",
+                    cabin: "Business",
+                    seat: "04A",
+                    checkedIn: false,
+                    gate: "B14"
+                }
+            ]
+        };
+
+        // =========================================================================
+        // 2. INITIALIZATION
+        // =========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            // Set default dates (tomorrow and +7 days)
+            const today = new Date();
+            const depart = new Date(today);
+            depart.setDate(today.getDate() + 3);
+            const ret = new Date(today);
+            ret.setDate(today.getDate() + 10);
+
+            document.getElementById('search-depart-date').value = depart.toISOString().split('T')[0];
+            document.getElementById('search-return-date').value = ret.toISOString().split('T')[0];
+
+            renderMyBookings();
+            renderFlightStatus();
+        });
+
+        // =========================================================================
+        // 3. NAVIGATION & UI HELPERS
+        // =========================================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-skybrand-600', 'text-white', 'shadow');
+                btn.classList.add('text-slate-300');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-skybrand-600', 'text-white', 'shadow');
+                activeBtn.classList.remove('text-slate-300');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = type === 'error'
+                ? 'bg-rose-600 text-white'
+                : type === 'info'
+                ? 'bg-navy-900 text-white border border-white/15'
+                : 'bg-emerald-600 text-white';
+
+            toast.className = `${colors} pointer-events-auto px-4 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-medium transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.innerHTML = `
+                <i data-lucide="${type === 'error' ? 'alert-circle' : 'check-circle-2'}" class="w-5 h-5 shrink-0"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3800);
+        }
+
+        // =========================================================================
+        // 4. FLIGHT SEARCH & FILTERING
+        // =========================================================================
+        function setTripType(type) {
+            appState.tripType = type;
+            const roundBtn = document.getElementById('trip-round');
+            const onewayBtn = document.getElementById('trip-oneway');
+            const returnWrapper = document.getElementById('return-date-wrapper');
+
+            if (type === 'round') {
+                roundBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-white text-navy-900 shadow-sm transition-all";
+                onewayBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-navy-900 transition-all";
+                returnWrapper.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                onewayBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-white text-navy-900 shadow-sm transition-all";
+                roundBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-navy-900 transition-all";
+                returnWrapper.classList.add('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function swapAirports() {
+            const origin = document.getElementById('search-origin');
+            const dest = document.getElementById('search-dest');
+            const temp = origin.value;
+            origin.value = dest.value;
+            dest.value = temp;
+        }
+
+        function quickSelectRoute(origin, dest) {
+            document.getElementById('search-origin').value = origin;
+            document.getElementById('search-dest').value = dest;
+            handleFlightSearch(new Event('submit'));
+        }
+
+        function handleFlightSearch(e) {
+            e.preventDefault();
+            const origin = document.getElementById('search-origin').value;
+            const dest = document.getElementById('search-dest').value;
+
+            if (origin === dest) {
+                showToast("Origin and destination airports cannot be the same.", "error");
+                return;
+            }
+
+            // Filter matching flights or generate dynamic partner schedules if route isn't hardcoded
+            let matches = FLIGHT_CATALOG.filter(f => f.origin === origin && f.dest === dest);
+
+            if (matches.length === 0) {
+                matches = [
+                    {
+                        id: `AI-${Math.floor(100 + Math.random() * 800)}`,
+                        origin,
+                        dest,
+                        depart: "09:15",
+                        arrive: "16:40",
+                        duration: "7h 25m",
+                        durationMins: 445,
+                        aircraft: "Boeing 787-9 Dreamliner",
+                        stops: "Non-stop",
+                        basePrice: 560,
+                        gate: "A14",
+                        status: "On Time"
+                    },
+                    {
+                        id: `AI-${Math.floor(100 + Math.random() * 800)}`,
+                        origin,
+                        dest,
+                        depart: "18:30",
+                        arrive: "02:10",
+                        duration: "7h 40m",
+                        durationMins: 460,
+                        aircraft: "Airbus A350-900",
+                        stops: "Non-stop",
+                        basePrice: 615,
+                        gate: "B09",
+                        status: "On Time"
+                    }
+                ];
+            }
+
+            appState.currentSearchResults = matches;
+            document.getElementById('results-heading').textContent = `${AIRPORTS[origin].city} (${origin}) to ${AIRPORTS[dest].city} (${dest})`;
+            document.getElementById('search-results-container').classList.remove('hidden');
+            renderFlightList();
+
+            document.getElementById('search-results-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderFlightList() {
+            const listEl = document.getElementById('flights-list');
+            const sortBy = document.getElementById('sort-flights').value;
+            const cabin = document.getElementById('search-cabin').value;
+            const passengers = parseInt(document.getElementById('search-passengers').value, 10);
+            const multiplier = CABIN_MULTIPLIERS[cabin] || 1;
+            const tripMult = appState.tripType === 'round' ? 1.85 : 1;
+
+            const sorted = [...appState.currentSearchResults].sort((a, b) => {
+                if (sortBy === 'price') return a.basePrice - b.basePrice;
+                if (sortBy === 'duration') return a.durationMins - b.durationMins;
+                return a.depart.localeCompare(b.depart);
+            });
+
+            listEl.innerHTML = sorted.map(flight => {
+                const perPaxPrice = Math.round(flight.basePrice * multiplier * tripMult);
+                const totalPrice = perPaxPrice * passengers;
+
+                return `
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm hover:shadow-md transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-6 flex-1">
+                            <!-- Airline & Aircraft -->
+                            <div class="min-w-[150px]">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-1 rounded-lg bg-navy-900 text-white font-mono text-xs font-bold">${flight.id}</span>
+                                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">${flight.stops}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2">${flight.aircraft}</p>
+                            </div>
+
+                            <!-- Timeline -->
+                            <div class="flex items-center justify-between sm:justify-center gap-4 flex-1">
+                                <div class="text-left sm:text-right">
+                                    <div class="font-display text-2xl font-extrabold text-navy-900">${flight.depart}</div>
+                                    <div class="text-xs font-bold text-slate-500">${flight.origin} • ${AIRPORTS[flight.origin].terminal}</div>
+                                </div>
+
+                                <div class="flex flex-col items-center px-2 flex-1 max-w-[180px]">
+                                    <span class="text-[11px] font-medium text-slate-400 mb-1">${flight.duration}</span>
+                                    <div class="w-full flex items-center gap-1">
+                                        <span class="w-2 h-2 rounded-full border-2 border-skybrand-600"></span>
+                                        <div class="h-[2px] bg-slate-200 flex-1 relative">
+                                            <i data-lucide="plane" class="w-3.5 h-3.5 text-skybrand-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+                                        </div>
+                                        <span class="w-2 h-2 rounded-full bg-skybrand-600"></span>
+                                    </div>
+                                    <span class="text-[10px] text-skybrand-600 font-semibold mt-1">${cabin}</span>
+                                </div>
+
+                                <div class="text-right sm:text-left">
+                                    <div class="font-display text-2xl font-extrabold text-navy-900">${flight.arrive}</div>
+                                    <div class="text-xs font-bold text-slate-500">${flight.dest} • ${AIRPORTS[flight.dest].terminal}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fare & CTA -->
+                        <div class="flex items-center justify-between lg:justify-end gap-6 pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+                            <div class="text-left lg:text-right">
+                                <span class="text-xs text-slate-400 block">${passengers} Pax • ${appState.tripType === 'round' ? 'Round Trip' : 'One Way'}</span>
+                                <span class="font-display text-2xl font-extrabold text-navy-900">$${totalPrice.toLocaleString()}</span>
+                            </div>
+                            <button onclick="openBookingModal('${flight.id}', ${totalPrice})" class="px-6 py-3.5 rounded-2xl bg-skybrand-600 hover:bg-skybrand-500 text-white font-semibold text-sm shadow-lg shadow-skybrand-600/20 transition-all">
+                                Select Seat
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // =========================================================================
+        // 5. SEAT SELECTION & CHECKOUT MODAL
+        // =========================================================================
+        function openBookingModal(flightId, calculatedBasePrice) {
+            const flight = appState.currentSearchResults.find(f => f.id === flightId);
+            if (!flight) return;
+
+            appState.activeFlight = { ...flight, calculatedBasePrice };
+            appState.selectedSeat = '14A';
+
+            document.getElementById('modal-flight-code').textContent = `${flight.id} • ${flight.aircraft}`;
+            document.getElementById('modal-route-title').textContent = `${AIRPORTS[flight.origin].city} (${flight.origin}) → ${AIRPORTS[flight.dest].city} (${flight.dest})`;
+
+            const cabin = document.getElementById('search-cabin').value;
+            const paxCount = document.getElementById('search-passengers').value;
+            document.getElementById('summary-cabin-label').textContent = `${cabin} Fare (${paxCount} Pax)`;
+            document.getElementById('addon-bag').checked = false;
+            document.getElementById('addon-meal').checked = false;
+
+            renderSeatMap();
+            recalculateTotal();
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function renderSeatMap() {
+            const grid = document.getElementById('seat-map-grid');
+            const rows = [12, 13, 14, 15, 16, 17];
+            const cols = ['A', 'B', 'C', '', 'D', 'E', 'F'];
+
+            grid.innerHTML = rows.map(row => {
+                const cells = cols.map(col => {
+                    if (col === '') {
+                        return `<div class="flex items-center justify-center text-[10px] font-bold text-slate-300">${row}</div>`;
+                    }
+                    const seatId = `${row}${col}`;
+                    const isOccupied = appState.occupiedSeats.includes(seatId);
+                    const isSelected = appState.selectedSeat === seatId;
+
+                    let btnClass = "bg-white border border-slate-300 text-slate-700 hover:border-skybrand-500";
+                    if (isOccupied) btnClass = "bg-slate-200 text-slate-400 cursor-not-allowed border border-transparent";
+                    if (isSelected) btnClass = "bg-skybrand-600 text-white font-bold shadow-sm border border-skybrand-600";
+
+                    return `
+                        <button type="button"
+                            ${isOccupied ? 'disabled' : `onclick="selectSeat('${seatId}')"`}
+                            class="h-7 rounded-md text-[10px] transition-all ${btnClass}">
+                            ${seatId}
+                        </button>
+                    `;
+                }).join('');
+
+                return `<div class="grid grid-cols-7 gap-1.5">${cells}</div>`;
+            }).join('');
+
+            document.getElementById('selected-seat-badge').textContent = `Seat: ${appState.selectedSeat}`;
+        }
+
+        function selectSeat(seatId) {
+            appState.selectedSeat = seatId;
+            renderSeatMap();
+        }
+
+        function recalculateTotal() {
+            if (!appState.activeFlight) return;
+            const base = appState.activeFlight.calculatedBasePrice;
+            const taxes = 65;
+            const bag = document.getElementById('addon-bag').checked ? 45 : 0;
+            const meal = document.getElementById('addon-meal').checked ? 25 : 0;
+
+            const addonsTotal = taxes + bag + meal;
+            document.getElementById('summary-base-price').textContent = `$${base.toLocaleString()}`;
+            document.getElementById('summary-addon-price').textContent = `$${addonsTotal}`;
+            document.getElementById('summary-total-price').textContent = `$${(base + addonsTotal).toLocaleString()}`;
+        }
+
+        function confirmBooking(e) {
+            e.preventDefault();
+            const fname = document.getElementById('pax-fname').value.trim();
+            const lname = document.getElementById('pax-lname').value.trim();
+            const departDate = document.getElementById('search-depart-date').value;
+            const cabin = document.getElementById('search-cabin').value;
+
+            const pnr = "IND" + Math.floor(100 + Math.random() * 899);
+            const newBooking = {
+                pnr,
+                flightId: appState.activeFlight.id,
+                origin: appState.activeFlight.origin,
+                dest: appState.activeFlight.dest,
+                date: departDate,
+                depart: appState.activeFlight.depart,
+                arrive: appState.activeFlight.arrive,
+                passenger: `${fname} ${lname}`,
+                cabin,
+                seat: appState.selectedSeat,
+                checkedIn: false,
+                gate: appState.activeFlight.gate
+            };
+
+            appState.bookings.unshift(newBooking);
+            appState.occupiedSeats.push(appState.selectedSeat);
+
+            // Award SkyMiles
+            const earnedMiles = 1450;
+            appState.miles += earnedMiles;
+            updateMilesDisplay();
+
+            closeBookingModal();
+            renderMyBookings();
+            switchTab('manage');
+            showToast(`Booking confirmed! PNR ${pnr} issued (+${earnedMiles} SkyMiles earned).`, 'success');
+        }
+
+        // =========================================================================
+        // 6. MANAGE BOOKINGS & DIGITAL BOARDING PASS
+        // =========================================================================
+        function lookupBooking(e) {
+            e.preventDefault();
+            const pnr = document.getElementById('pnr-input').value.trim().toUpperCase();
+            if (!pnr) {
+                showToast("Please enter a valid 6-character PNR code.", "error");
+                return;
+            }
+            const found = appState.bookings.find(b => b.pnr === pnr);
+            if (found) {
+                showToast(`Itinerary ${pnr} located for ${found.passenger}.`, "success");
+            } else {
+                showToast(`No active reservation found for PNR "${pnr}". Showing your saved trips.`, "info");
+            }
+        }
+
+        function renderMyBookings() {
+            const container = document.getElementById('my-bookings-list');
+            if (appState.bookings.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 bg-white rounded-3xl border border-slate-200 text-slate-500">No active reservations found.</div>`;
+                return;
+            }
+
+            container.innerHTML = appState.bookings.map(b => `
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <span class="px-3 py-1 rounded-lg bg-navy-950 text-white font-mono text-xs font-bold tracking-wider">PNR: ${b.pnr}</span>
+                            <span class="px-3 py-1 rounded-lg bg-skybrand-50 text-skybrand-700 text-xs font-bold">${b.flightId} • ${b.cabin}</span>
+                            <span class="px-3 py-1 rounded-lg ${b.checkedIn ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'} text-xs font-bold">
+                                ${b.checkedIn ? 'Checked-In • Pass Ready' : 'Check-In Open'}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-4 pt-1">
+                            <div>
+                                <div class="font-display text-2xl font-extrabold text-navy-900">${b.origin}</div>
+                                <div class="text-xs text-slate-500">${AIRPORTS[b.origin].city} • ${b.depart}</div>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-slate-400"></i>
+                            <div>
+                                <div class="font-display text-2xl font-extrabold text-navy-900">${b.dest}</div>
+                                <div class="text-xs text-slate-500">${AIRPORTS[b.dest].city} • ${b.arrive}</div>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-slate-500 flex flex-wrap gap-4 pt-1">
+                            <span><strong>Passenger:</strong> ${b.passenger}</span>
+                            <span><strong>Date:</strong> ${b.date}</span>
+                            <span><strong>Seat:</strong> ${b.seat}</span>
+                            <span><strong>Gate:</strong> ${b.gate}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        ${!b.checkedIn ? `
+                            <button onclick="completeCheckIn('${b.pnr}')" class="px-5 py-3 rounded-xl bg-skybrand-600 hover:bg-skybrand-500 text-white font-semibold text-sm shadow-md transition-all">
+                                Online Check-In
+                            </button>
+                        ` : `
+                            <button onclick="openBoardingPass('${b.pnr}')" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md flex items-center gap-2 transition-all">
+                                <i data-lucide="qr-code" class="w-4 h-4"></i> View Boarding Pass
+                            </button>
+                        `}
+                        <button onclick="cancelBooking('${b.pnr}')" class="px-4 py-3 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-600 font-semibold text-sm transition-all">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function completeCheckIn(pnr) {
+            const booking = appState.bookings.find(b => b.pnr === pnr);
+            if (booking) {
+                booking.checkedIn = true;
+                renderMyBookings();
+                openBoardingPass(pnr);
+                showToast(`Check-in completed for ${booking.passenger}!`, 'success');
+            }
+        }
+
+        function cancelBooking(pnr) {
+            appState.bookings = appState.bookings.filter(b => b.pnr !== pnr);
+            renderMyBookings();
+            showToast(`Reservation ${pnr} has been cancelled and refunded to original payment method.`, 'info');
+        }
+
+        function openBoardingPass(pnr) {
+            const b = appState.bookings.find(item => item.pnr === pnr);
+            if (!b) return;
+
+            document.getElementById('boarding-pass-content').innerHTML = `
+                <div class="flex justify-between items-center pb-5 border-b border-dashed border-slate-300">
+                    <div>
+                        <span class="text-xs text-slate-400 uppercase">From</span>
+                        <div class="font-display text-3xl font-extrabold text-navy-900">${b.origin}</div>
+                        <span class="text-xs text-slate-500">${AIRPORTS[b.origin].city}</span>
+                    </div>
+                    <i data-lucide="plane" class="w-6 h-6 text-skybrand-600"></i>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 uppercase">To</span>
+                        <div class="font-display text-3xl font-extrabold text-navy-900">${b.dest}</div>
+                        <span class="text-xs text-slate-500">${AIRPORTS[b.dest].city}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 py-5 border-b border-dashed border-slate-300 text-sm">
+                    <div>
+                        <span class="text-[11px] text-slate-400 block uppercase">Flight</span>
+                        <span class="font-bold text-navy-900">${b.flightId}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block uppercase">Gate</span>
+                        <span class="font-bold text-navy-900">${b.gate}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block uppercase">Seat</span>
+                        <span class="font-bold text-skybrand-600">${b.seat}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block uppercase">Date</span>
+                        <span class="font-semibold text-slate-800">${b.date}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block uppercase">Boarding</span>
+                        <span class="font-semibold text-slate-800">${b.depart}</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block uppercase">Class</span>
+                        <span class="font-semibold text-slate-800">${b.cabin}</span>
+                    </div>
+                </div>
+
+                <div class="pt-5 text-center">
+                    <div class="text-xs text-slate-500 mb-3">Passenger: <strong class="text-navy-900">${b.passenger}</strong> • PNR: <strong>${b.pnr}</strong></div>
+                    <!-- Stylized Barcode SVG -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block">
+                        <svg class="w-48 h-12 mx-auto text-navy-950" viewBox="0 0 200 40" fill="currentColor">
+                            <rect x="4" y="2" width="4" height="36"/><rect x="12" y="2" width="2" height="36"/>
+                            <rect x="18" y="2" width="6" height="36"/><rect x="28" y="2" width="2" height="36"/>
+                            <rect x="34" y="2" width="4" height="36"/><rect x="44" y="2" width="8" height="36"/>
+                            <rect x="56" y="2" width="2" height="36"/><rect x="62" y="2" width="4" height="36"/>
+                            <rect x="72" y="2" width="6" height="36"/><rect x="82" y="2" width="2" height="36"/>
+                            <rect x="90" y="2" width="4" height="36"/><rect x="98" y="2" width="6" height="36"/>
+                            <rect x="110" y="2" width="2" height="36"/><rect x="116" y="2" width="8" height="36"/>
+                            <rect x="128" y="2" width="4" height="36"/><rect x="136" y="2" width="2" height="36"/>
+                            <rect x="144" y="2" width="6" height="36"/><rect x="154" y="2" width="4" height="36"/>
+                            <rect x="164" y="2" width="2" height="36"/><rect x="172" y="2" width="6" height="36"/>
+                            <rect x="182" y="2" width="4" height="36"/><rect x="190" y="2" width="4" height="36"/>
+                        </svg>
+                        <div class="font-mono text-[10px] tracking-[0.3em] text-slate-500 mt-1">${b.pnr}-0019482</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('boarding-pass-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeBoardingPass() {
+            document.getElementById('boarding-pass-modal').classList.add('hidden');
+        }
+
+        // =========================================================================
+        // 7. LIVE FLIGHT STATUS & LOYALTY REDEMPTION
+        // =========================================================================
+        function renderFlightStatus() {
+            const query = document.getElementById('status-filter').value.trim().toLowerCase();
+            const tbody = document.getElementById('flight-status-tbody');
+
+            const filtered = FLIGHT_CATALOG.filter(f => {
+                const originCity = AIRPORTS[f.origin].city.toLowerCase();
+                const destCity = AIRPORTS[f.dest].city.toLowerCase();
+                return f.id.toLowerCase().includes(query) ||
+                       f.origin.toLowerCase().includes(query) ||
+                       f.dest.toLowerCase().includes(query) ||
+                       originCity.includes(query) ||
+                       destCity.includes(query);
+            });
+
+            tbody.innerHTML = filtered.map(f => {
+                const badgeStyle = f.status === 'On Time'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : f.status === 'Boarding'
+                    ? 'bg-skybrand-50 text-skybrand-700 border-skybrand-200 animate-pulse'
+                    : 'bg-amber-50 text-amber-700 border-amber-200';
+
+                return `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="py-4 px-6 font-mono font-bold text-navy-900">${f.id}</td>
+                        <td class="py-4 px-6">
+                            <div class="font-semibold text-navy-900">${AIRPORTS[f.origin].city} (${f.origin}) → ${AIRPORTS[f.dest].city} (${f.dest})</div>
+                        </td>
+                        <td class="py-4 px-6 font-medium text-slate-700">${f.depart} – ${f.arrive}</td>
+                        <td class="py-4 px-6 text-slate-600">${AIRPORTS[f.origin].terminal} / Gate <strong>${f.gate}</strong></td>
+                        <td class="py-4 px-6 text-slate-500 text-xs">${f.aircraft}</td>
+                        <td class="py-4 px-6">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border ${badgeStyle}">${f.status}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateMilesDisplay() {
+            document.getElementById('header-miles').textContent = `${appState.miles.toLocaleString()} pts`;
+            document.getElementById('loyalty-balance-display').textContent = appState.miles.toLocaleString();
+        }
+
+        function redeemMiles(cost, rewardName) {
+            if (appState.miles < cost) {
+                showToast(`Insufficient SkyMiles. You need ${cost.toLocaleString()} pts for this reward.`, 'error');
+                return;
+            }
+            appState.miles -= cost;
+            updateMilesDisplay();
+            showToast(`Redeemed "${rewardName}"! Voucher sent to your SkyClub wallet.`, 'success');
+        }
+    </script>
+</body>
+</html>
